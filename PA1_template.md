@@ -1,10 +1,5 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-author: "Tirza Guerra"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
+Tirza Guerra  
 
 ## Introduction
 
@@ -33,9 +28,21 @@ The dataset is stored in a comma-separated-value (CSV) file, and there are a tot
 
 Here, I will assume that the dataset file (activity.csv) is available in the working directory.
 
-```{r load_data}
+
+```r
 activity <- read.csv("activity.csv")
 summary(activity)
+```
+
+```
+##      steps                date          interval     
+##  Min.   :  0.00   2012-10-01:  288   Min.   :   0.0  
+##  1st Qu.:  0.00   2012-10-02:  288   1st Qu.: 588.8  
+##  Median :  0.00   2012-10-03:  288   Median :1177.5  
+##  Mean   : 37.38   2012-10-04:  288   Mean   :1177.5  
+##  3rd Qu.: 12.00   2012-10-05:  288   3rd Qu.:1766.2  
+##  Max.   :806.00   2012-10-06:  288   Max.   :2355.0  
+##  NA's   :2304     (Other)   :15840
 ```
 
 
@@ -45,12 +52,29 @@ summary(activity)
 * Make a histogram of the total number of steps taken each day.
 * Calculate and report the mean and median of the total number of steps taken per day.
 
-```{r steps_per_day}
+
+```r
 stepsPerDay <- tapply(activity$steps, activity$date, FUN = sum, na.rm = TRUE)
 hist(stepsPerDay, main = "Mean Total Number of Steps Taken Per Day", 
      xlab = "Number of Steps")
+```
+
+![](PA1_template_files/figure-html/steps_per_day-1.png) 
+
+```r
 mean(stepsPerDay, na.rm = TRUE)
+```
+
+```
+## [1] 9354.23
+```
+
+```r
 median(stepsPerDay, na.rm = TRUE)
+```
+
+```
+## [1] 10395
 ```
 
 
@@ -58,7 +82,8 @@ median(stepsPerDay, na.rm = TRUE)
 
 * Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis).
 
-```{r average_pattern}
+
+```r
 avgPattern <- aggregate(steps ~ interval, data = activity, FUN = mean, 
                         na.rm = TRUE)
 plot(steps ~ interval, data = avgPattern, type = "l", col = "blue", 
@@ -66,10 +91,18 @@ plot(steps ~ interval, data = avgPattern, type = "l", col = "blue",
      xlab = "5-Minute Interval", ylab = "Average Number of Steps")
 ```
 
+![](PA1_template_files/figure-html/average_pattern-1.png) 
+
 * Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-```{r max_interval}
+
+```r
 avgPattern[which.max(avgPattern$steps),]
+```
+
+```
+##     interval    steps
+## 104      835 206.1698
 ```
 
 
@@ -79,8 +112,13 @@ Note that there are a number of days/intervals where there are missing values (c
 
 * Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs).
 
-```{r total_NAs}
+
+```r
 sum(is.na(activity$steps))
+```
+
+```
+## [1] 2304
 ```
 
 * Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
@@ -89,7 +127,8 @@ I will use the mean of the 5-minute interval across all days to fill the missing
 
 * Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
-```{r missing_values}
+
+```r
 fillNAs <- function(steps, interval) {
         value <- NA
         if (!is.na(steps))
@@ -105,13 +144,30 @@ new_activity$steps <- mapply(fillNAs, new_activity$steps, new_activity$interval)
 
 * Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of inputing missing data on the estimates of the total daily number of steps?
 
-```{r steps_per_day2}
+
+```r
 stepsPerDay2 <- tapply(new_activity$steps, new_activity$date, FUN = sum)
 hist(stepsPerDay2,
      main = "Mean Total Number of Steps Taken Per Day (no Missing Values)", 
      xlab = "Number of Steps")
+```
+
+![](PA1_template_files/figure-html/steps_per_day2-1.png) 
+
+```r
 mean(stepsPerDay2, na.rm = TRUE)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(stepsPerDay2, na.rm = TRUE)
+```
+
+```
+## [1] 10766.19
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
@@ -121,11 +177,10 @@ For this part the weekdays() function may be of some help here. Use the dataset 
 * Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
 * Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
 
-```{r echo = FALSE, results = "hide"}
-Sys.setlocale(category = "LC_ALL", locale = "English_United States.1252")
-```
 
-```{r day_type}
+
+
+```r
 new_activity$date <- as.Date(new_activity$date)
 new_activity$daytype <- as.factor(ifelse(weekdays(new_activity$date) %in% 
                                                  c("Saturday", "Sunday"), 
@@ -133,7 +188,18 @@ new_activity$daytype <- as.factor(ifelse(weekdays(new_activity$date) %in%
 summary(new_activity)
 ```
 
-```{r plot_daytype}
+```
+##      steps             date               interval         daytype     
+##  Min.   :  0.00   Min.   :2012-10-01   Min.   :   0.0   weekday:12960  
+##  1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 588.8   weekend: 4608  
+##  Median :  0.00   Median :2012-10-31   Median :1177.5                  
+##  Mean   : 37.38   Mean   :2012-10-31   Mean   :1177.5                  
+##  3rd Qu.: 27.00   3rd Qu.:2012-11-15   3rd Qu.:1766.2                  
+##  Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0
+```
+
+
+```r
 library(lattice)
 avgPattern2 <- aggregate(steps ~ interval + daytype, data = new_activity, 
                          FUN = mean, na.rm = TRUE)
@@ -142,3 +208,5 @@ xyplot(steps ~ interval | daytype, data = avgPattern2, type = "l",
        xlab = "5-Minute Interval", ylab = "Average Number of Steps", 
        col = "blue", layout = c(1,2))
 ```
+
+![](PA1_template_files/figure-html/plot_daytype-1.png) 
